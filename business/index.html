@@ -173,6 +173,15 @@ const PROJECTS = [
     tagsEn: ["Platform", "Sports · Booking", "2026"],
     cover: ""
   },
+  {
+    name: "리뉴젠 아카데미",
+    loc:  "Renewjen Academy · 교육",
+    url:  "https://koreayjk.github.io/renewgen/",
+    path: "koreayjk.github.io/renewgen",
+    tags:   ["기업 사이트", "교육 · 아카데미", "2026"],
+    tagsEn: ["Company site", "Academy", "2026"],
+    cover: ""
+  },
   // 새 항목 추가 예시:
   // { name:"회사 이름", loc:"City, State", url:"https://...", path:"도메인/경로",
   //   tags:["기업 사이트","반응형","2025"], tagsEn:["Company site","Responsive","2025"], cover:"" },
@@ -198,7 +207,7 @@ let firstPaint=true;
 function renderGrid(lang){
   grid.innerHTML=''; const t=T[lang];
   PROJECTS.forEach(p=>{
-    const shot=(p.cover||p.url)?`<img src="${p.cover||('https://s.wordpress.com/mshots/v1/'+encodeURIComponent(p.url)+'?w=1200&h=750')}" alt="${p.name}" loading="lazy">`:`<div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 8h18M8 21h8M12 18v3"/></svg></div>`;
+    const shot=(p.cover||p.url)?`<img src="${p.cover||('https://image.thum.io/get/width/1200/crop/800/'+p.url)}" alt="${p.name}" loading="lazy" onerror="this.style.display='none'">`:`<div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 8h18M8 21h8M12 18v3"/></svg></div>`;
     const tg=(lang==='en'?(p.tagsEn||p.tags):p.tags)||[];
     const tags=tg.map(x=>`<span class="tag">${x}</span>`).join('');
     const el=document.createElement('a'); el.className='proj'; el.href=p.url; el.target='_blank'; el.rel='noopener';

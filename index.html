@@ -214,7 +214,7 @@ footer{border-top:1px solid var(--line);padding:70px 0 34px}
           <h3 data-i18n="bizTitle">Business</h3>
           <p data-i18n="bizDesc">기업 · 브랜드 · 스토어를 위한 홈페이지와 랜딩 페이지.</p>
           <ul class="svc"><li data-i18n="bizF1">기업 사이트</li><li data-i18n="bizF2">랜딩 페이지</li><li data-i18n="bizF3">브랜딩</li></ul>
-          <div class="foot"><span class="cnt"><b>2</b> <span data-i18n="sites">사이트</span></span><span class="view"><span data-i18n="viewWork">작업 보기</span> <span class="ar">&rarr;</span></span></div>
+          <div class="foot"><span class="cnt"><b>3</b> <span data-i18n="sites">사이트</span></span><span class="view"><span data-i18n="viewWork">작업 보기</span> <span class="ar">&rarr;</span></span></div>
         </div>
       </a>
       <a class="door church" href="church/">
@@ -353,11 +353,11 @@ const T={
   fContactH:"Contact",fEmail:"Email us",fLoc:"Texas, USA",
   copyright:"© 2026 IM America Group Corp · Texas, USA",dba:"@IM is a registered DBA of IM America Group Corp."}
 };
-function setLang(l){const t=T[l];document.documentElement.lang=l;document.title=t.title;
+function setLang(l){const t=T[l];document.documentElement.lang=l;try{localStorage.setItem('imLang',l)}catch(e){}document.title=t.title;
  document.querySelectorAll('[data-i18n]').forEach(e=>{const k=e.getAttribute('data-i18n');if(t[k]!==undefined)e.innerHTML=t[k];});
  document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));}
 document.querySelectorAll('#lang button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
-setLang('ko');
+(function(){var l='ko';try{var s=localStorage.getItem('imLang');if(s)l=s}catch(e){}var u=new URLSearchParams(location.search).get('lang');if(u)l=u;if(l!=='ko'&&l!=='en')l='ko';setLang(l)})();
 </script>
 </body>
 </html>

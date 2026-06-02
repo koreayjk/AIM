@@ -173,7 +173,7 @@ let firstPaint=true;
 function renderGrid(lang){
   grid.innerHTML=''; const t=T[lang];
   PROJECTS.forEach(p=>{
-    const shot=p.cover?`<img src="${p.cover}" alt="${p.name}">`:`<div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></div>`;
+    const shot=(p.cover||p.url)?`<img src="${p.cover||('https://image.thum.io/get/width/1200/crop/800/'+p.url)}" alt="${p.name}" loading="lazy" onerror="this.style.display='none'">`:`<div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></div>`;
     const tg=(lang==='en'?(p.tagsEn||p.tags):p.tags)||[];
     const tags=tg.map(x=>`<span class="tag">${x}</span>`).join('');
     const el=document.createElement('a'); el.className='proj'; el.href=p.url; el.target='_blank'; el.rel='noopener';
@@ -190,13 +190,13 @@ function renderGrid(lang){
   if(firstPaint){ const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.1}); cards.forEach(c=>io.observe(c)); firstPaint=false; }
   else cards.forEach(c=>c.classList.add('in'));
 }
-function setLang(l){ const t=T[l]; document.documentElement.lang=l; document.title=t.title;
+function setLang(l){ const t=T[l]; document.documentElement.lang=l; try{localStorage.setItem('imLang',l)}catch(e){} document.title=t.title;
   document.querySelectorAll('[data-i18n]').forEach(e=>{const k=e.getAttribute('data-i18n'); if(t[k]!==undefined) e.innerHTML=t[k];});
   document.querySelectorAll('#lang button').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));
   renderGrid(l);
 }
 document.querySelectorAll('#lang button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
-setLang('ko');
+(function(){var l='ko';try{var s=localStorage.getItem('imLang');if(s)l=s}catch(e){}var u=new URLSearchParams(location.search).get('lang');if(u)l=u;if(l!=='ko'&&l!=='en')l='ko';setLang(l)})();
 </script>
 </body>
 </html>

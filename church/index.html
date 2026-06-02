@@ -272,8 +272,8 @@ function renderGrid(lang){
   grid.innerHTML = '';
   const t = T[lang];
   PROJECTS.forEach(p=>{
-    const shot = p.cover
-      ? `<img src="${p.cover}" alt="${p.name}">`
+    const shot = (p.cover||p.url)
+      ? `<img src="${p.cover||('https://image.thum.io/get/width/1200/crop/800/'+p.url)}" alt="${p.name}" loading="lazy" onerror="this.style.display='none'">`
       : `<div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 8h18M8 21h8M12 18v3"/></svg></div>`;
     const tg = (lang==='en' ? (p.tagsEn||p.tags) : p.tags)||[];
     const tags = tg.map(x=>`<span class="tag">${x}</span>`).join('');
@@ -318,6 +318,7 @@ function renderGrid(lang){
 function setLang(lang){
   const t = T[lang];
   document.documentElement.lang = lang;
+  try{localStorage.setItem('imLang',lang)}catch(e){}
   document.title = t.title;
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const k = el.getAttribute('data-i18n');
@@ -332,7 +333,7 @@ document.querySelectorAll('#lang button').forEach(b=>{
   b.addEventListener('click',()=>setLang(b.dataset.lang));
 });
 
-setLang('ko'); // 기본 언어
+(function(){var l='ko';try{var s=localStorage.getItem('imLang');if(s)l=s}catch(e){}var u=new URLSearchParams(location.search).get('lang');if(u)l=u;if(l!=='ko'&&l!=='en')l='ko';setLang(l)})(); // 기본 언어(저장값 우선)
 </script>
 </body>
 </html>

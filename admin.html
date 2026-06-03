@@ -78,8 +78,12 @@ header{display:flex;align-items:center;justify-content:space-between;gap:16px;pa
 .row .k{flex:0 0 130px;color:var(--muted);font-weight:600}
 .row .v{flex:1;white-space:pre-wrap}
 .row .v a{color:var(--navy);font-weight:600}
-.del{margin-top:24px;background:none;border:1px solid #e3c4c0;color:#c0392b;border-radius:10px;padding:9px 16px;font-size:.84rem;font-weight:600}
+.del{background:none;border:1px solid #e3c4c0;color:#c0392b;border-radius:10px;padding:9px 16px;font-size:.84rem;font-weight:600}
 .del:hover{background:#fdf0ef}
+.dact{display:flex;gap:10px;margin-top:24px;align-items:center;flex-wrap:wrap}
+.copy{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:11px 20px;font-size:.92rem;font-weight:700}
+.copy:hover{background:var(--navy2)}
+.copy.ok{background:#1e8a4c}
 
 @media(max-width:880px){ .layout{grid-template-columns:1fr} .detail{position:static} .listcol{max-height:none} }
 </style>
@@ -198,10 +202,20 @@ function renderDetail(r){
     ${(r.domain||r.domain_want||r.edit_pref)?`<div class="grp"><div class="gk">도메인 · 운영</div>${field('도메인 보유',r.domain)}${field('원하는 주소',r.domain_want)}${field('수정 선호',r.edit_pref)}</div>`:''}
     ${(r.timeline||r.budget)?`<div class="grp"><div class="gk">일정 · 예산</div>${field('완료 시기',r.timeline)}${field('예산',r.budget)}</div>`:''}
     ${(r.etc)?`<div class="grp"><div class="gk">기타 요청</div>${field('내용',r.etc)}</div>`:''}
-    <button class="del" data-id="${r.id}">이 의뢰 삭제</button>
+    <div class="dact">
+      <button class="copy" data-id="${r.id}">📋 내용 복사하기 (Claude에게 붙여넣기)</button>
+      <button class="del" data-id="${r.id}">삭제</button>
+    </div>
   `;
   d.querySelectorAll('.statusbar button').forEach(b=>b.addEventListener('click',()=>changeStatus(r.id,b.dataset.s)));
   d.querySelector('.del').addEventListener('click',()=>del(r.id));
+  d.querySelector('.copy').addEventListener('click', async (e)=>{
+    const t=buildText(r);
+    try{ await navigator.clipboard.writeText(t); }
+    catch(err){ const ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.focus(); ta.select(); try{document.execCommand('copy');}catch(_){} ta.remove(); }
+    const b=e.currentTarget, o=b.textContent; b.classList.add('ok'); b.textContent='✓ 복사되었습니다!';
+    setTimeout(()=>{ b.classList.remove('ok'); b.textContent=o; },1700);
+  });
 }
 
 async function changeStatus(id,s){
@@ -218,6 +232,22 @@ async function del(id){
   document.getElementById('detail').innerHTML='<div class="empty">왼쪽에서 의뢰를 선택하세요.</div>';
   document.getElementById('count').textContent=rows.length+"건";
   renderList();
+}
+function buildText(r){
+  const L=[]; L.push('[홈페이지 제작 의뢰]');
+  L.push('제작 방식: '+(MODE_LABEL[r.mode]||r.mode||''));
+  const add=(k,v)=>{ if(v) L.push(k+': '+v); };
+  add('단체/사업체명', r.org_name); add('담당자', r.contact_name);
+  add('전화', r.phone); add('이메일', r.email); add('분야', r.field);
+  add((r.mode==='keep'?'기존 홈페이지':'참고 홈페이지'), r.ref_url);
+  add('목적', r.purpose); add('방문자', r.audience); add('바라는 행동', r.goal);
+  add('메뉴', r.pages); add('보유 자료', r.assets); add('소개글', r.intro);
+  add('주소·운영시간·연락처', r.contact_info);
+  add('디자인 느낌', r.mood); add('색상', r.colors); add('참고 사이트', r.ref_sites);
+  add('기능', r.features); add('도메인 보유', r.domain); add('원하는 주소', r.domain_want);
+  add('수정 선호', r.edit_pref); add('완료 시기', r.timeline); add('예산', r.budget);
+  add('기타 요청', r.etc);
+  return L.join('\n');
 }
 function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 </script>

@@ -86,7 +86,7 @@ section{padding:96px 0}
 .sec-top h2 em{font-style:italic;color:var(--green)}
 .sec-top p{color:var(--muted);max-width:340px;font-size:.96rem}
 
-.doors{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.doors{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
 .door{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:22px;display:flex;flex-direction:column;transition:.35s;overflow:hidden}
 .door:hover{transform:translateY(-6px);box-shadow:0 44px 84px -46px rgba(21,32,27,.45);border-color:transparent}
 .door .cover{position:relative;height:184px;overflow:hidden}
@@ -110,9 +110,10 @@ section{padding:96px 0}
 .door.business{--ac:var(--blue);--cov:linear-gradient(150deg,rgba(31,63,115,.62),rgba(12,26,52,.30))}
 .door.church{--ac:var(--green);--cov:linear-gradient(150deg,rgba(31,63,115,.66),rgba(12,26,52,.34))}
 .door.apps{--ac:var(--violet);--cov:linear-gradient(150deg,rgba(31,63,115,.64),rgba(12,26,52,.32))}
+.door.print{--ac:var(--navy);--cov:linear-gradient(150deg,rgba(31,63,115,.30),transparent)}
 .door.apps .dbody .svc li{background:#e9eef7}
 
-.svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.svc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
 .scard{padding:30px 26px;border:1px solid var(--line);border-radius:18px;background:var(--panel);transition:.3s}
 .scard:hover{transform:translateY(-5px);box-shadow:0 28px 56px -38px rgba(21,32,27,.35)}
 .scard .si{width:44px;height:44px;border-radius:12px;background:var(--soft);color:var(--green);display:grid;place-items:center;margin-bottom:18px}
@@ -152,7 +153,7 @@ footer{border-top:1px solid var(--line);padding:70px 0 34px}
 
 @media(max-width:900px){
   .nav-links{display:none}
-  .doors{grid-template-columns:1fr}
+  .doors{grid-template-columns:repeat(2,1fr)}
   .svc-grid{grid-template-columns:1fr 1fr}
   .strip{grid-template-columns:1fr 1fr}
   .strip figure:nth-child(3){aspect-ratio:4/3}
@@ -209,13 +210,14 @@ footer{border-top:1px solid var(--line);padding:70px 0 34px}
     <span data-i18n="r2">웹 개발</span><i></i>
     <span data-i18n="r3">브랜딩</span><i></i>
     <span data-i18n="r5">앱 개발</span><i></i>
+    <span data-i18n="r7">홍보물 디자인</span><i></i>
     <span data-i18n="r4">유지보수 · 호스팅</span>
   </div></div>
 
   <section id="work"><div class="wrap">
     <div class="sec-top">
-      <h2 data-i18n="workTitle">우리가 일하는 <em>세 영역</em></h2>
-      <p data-i18n="workSub">기업, 교회, 그리고 앱. 각 영역의 실제 작업물을 확인하세요.</p>
+      <h2 data-i18n="workTitle">우리가 일하는 <em>네 영역</em></h2>
+      <p data-i18n="workSub">기업, 교회, 앱, 그리고 홍보물. 각 영역의 실제 작업을 확인하세요.</p>
     </div>
     <div class="doors">
       <a class="door business" href="business/">
@@ -254,7 +256,19 @@ footer{border-top:1px solid var(--line);padding:70px 0 34px}
           <h3 data-i18n="apTitle">Apps</h3>
           <p data-i18n="apDesc">모바일·웹 앱을 기획하고 개발합니다.</p>
           <ul class="svc"><li data-i18n="apF1">모바일 앱</li><li data-i18n="apF2">웹 앱</li><li data-i18n="apF3">유지보수</li></ul>
-          <div class="foot"><span class="cnt"><b>2</b> <span data-i18n="sites">사이트</span></span><span class="view"><span data-i18n="viewWork3">작업 보기</span> <span class="ar">&rarr;</span></span></div>
+          <div class="foot"><span class="cnt"><b>3</b> <span data-i18n="sites">사이트</span></span><span class="view"><span data-i18n="viewWork3">작업 보기</span> <span class="ar">&rarr;</span></span></div>
+        </div>
+      </a>
+      <a class="door print" href="request.html">
+        <div class="cover" style="background:linear-gradient(135deg,#1f3f73,#15294d)">
+          <span class="idx">04</span>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg></span>
+        </div>
+        <div class="dbody">
+          <h3 data-i18n="prTitle">홍보물</h3>
+          <p data-i18n="prDesc">포스터·브로셔·팸플릿·명함 등 인쇄·홍보물 디자인.</p>
+          <ul class="svc"><li data-i18n="prF1">포스터·브로셔</li><li data-i18n="prF2">팸플릿·명함</li><li data-i18n="prF3">인쇄 디자인</li></ul>
+          <div class="foot"><span class="cnt" data-i18n="prCta" style="color:var(--navy);font-weight:700">의뢰하기</span><span class="view"><span data-i18n="prView">문의</span> <span class="ar">&rarr;</span></span></div>
         </div>
       </a>
     </div>
@@ -270,6 +284,7 @@ footer{border-top:1px solid var(--line);padding:70px 0 34px}
       <div class="scard"><div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m8 6-6 6 6 6M16 6l6 6-6 6"/></svg></div><h4 data-i18n="s2t">웹 개발</h4><p data-i18n="s2p">반응형·고성능 사이트와 관리자 기능.</p></div>
       <div class="scard"><div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18M3 12h18"/></svg></div><h4 data-i18n="s3t">AI 솔루션</h4><p data-i18n="s3p">업무를 돕는 맞춤형 AI 도구를 만듭니다.</p></div>
       <div class="scard"><div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2a10 10 0 1 0 10 10M12 6v6l4 2"/></svg></div><h4 data-i18n="s4t">유지보수</h4><p data-i18n="s4p">호스팅·업데이트·지속 관리.</p></div>
+      <div class="scard"><div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/></svg></div><h4 data-i18n="s5t">홍보물 디자인</h4><p data-i18n="s5p">포스터·브로셔·팸플릿·명함 인쇄물.</p></div>
     </div>
   </div></section>
 
@@ -323,8 +338,9 @@ const T={
   heroSub:"@IM은 텍사스에 자리한 AI 기반 IT 회사입니다. 웹·앱·소프트웨어로 사람과 비즈니스, 그리고 공동체가 더 나아지도록 돕습니다.",
   heroWork:"작업 보기",heroStart:"제작 의뢰하기",heroChip:"AI · 웹 · 앱 · 소프트웨어",
   r1:"웹 디자인",r2:"웹 개발",r3:"브랜딩",r4:"유지보수 · 호스팅",r6:"AI 솔루션",
-  workTitle:"우리가 일하는 <em>세 영역</em>",workSub:"기업, 교회, 그리고 앱. 각 영역의 실제 작업물을 확인하세요.",
-  r5:"앱 개발",apTitle:"Apps",apDesc:"모바일·웹 앱을 기획하고 개발합니다.",apF1:"모바일 앱",apF2:"웹 앱",apF3:"유지보수",apCnt:"준비 중",viewWork3:"작업 보기",
+  workTitle:"우리가 일하는 <em>네 영역</em>",workSub:"기업, 교회, 앱, 그리고 홍보물. 각 영역의 실제 작업을 확인하세요.",
+  r5:"앱 개발",r7:"홍보물 디자인",apTitle:"Apps",apDesc:"모바일·웹 앱을 기획하고 개발합니다.",apF1:"모바일 앱",apF2:"웹 앱",apF3:"유지보수",apCnt:"준비 중",viewWork3:"작업 보기",
+  prTitle:"홍보물",prDesc:"포스터·브로셔·팸플릿·명함 등 인쇄·홍보물 디자인.",prF1:"포스터·브로셔",prF2:"팸플릿·명함",prF3:"인쇄 디자인",prCta:"의뢰하기",prView:"문의",
   bizTitle:"Business",bizDesc:"기업 · 브랜드 · 스토어를 위한 홈페이지와 랜딩 페이지.",
   bizF1:"기업 사이트",bizF2:"랜딩 페이지",bizF3:"브랜딩",bizCnt:"준비 중",
   chTitle:"Church",chDesc:"교회 · 선교단체를 위한 홈페이지. 교회는 언제나 무료로 제작합니다.",
@@ -334,6 +350,7 @@ const T={
   s2t:"웹 개발",s2p:"반응형·고성능 사이트와 관리자 기능.",
   s3t:"AI 솔루션",s3p:"업무를 돕는 맞춤형 AI 도구를 만듭니다.",
   s4t:"유지보수",s4p:"호스팅·업데이트·지속 관리.",
+  s5t:"홍보물 디자인",s5p:"포스터·브로셔·팸플릿·명함 인쇄물.",
   galTitle:"현장에서, <em>꾸준히</em>",galSub:"디자인하고, 만들고, 다듬는 일상.",
   stKick:"회사 소개",stH2:"텍사스의 AI 기반 IT 회사, <em>기술로 사람을</em> 돕습니다.",
   stM1:"USA · 활동 기반",stM2:"운영 중인 교회 사이트",stM3free:"무료",stM3:"교회 홈페이지 제작",stM4:"이중 언어 지원",
@@ -348,8 +365,9 @@ const T={
   heroSub:"@IM is an AI-driven IT company based in Texas. We help people, businesses, and communities through web, apps, and software.",
   heroWork:"View work",heroStart:"Request a site",heroChip:"AI · Web · Apps · Software",
   r1:"Web Design",r2:"Development",r3:"Branding",r4:"Care · Hosting",r6:"AI Solutions",
-  workTitle:"Three areas <em>we work in</em>",workSub:"Companies, churches, and apps. Explore the real work in each.",
-  r5:"App Dev",apTitle:"Apps",apDesc:"We design and develop mobile & web apps.",apF1:"Mobile apps",apF2:"Web apps",apF3:"Maintenance",apCnt:"Coming soon",viewWork3:"View work",
+  workTitle:"Four areas <em>we work in</em>",workSub:"Companies, churches, apps, and print. Explore the real work in each.",
+  r5:"App Dev",r7:"Print Design",apTitle:"Apps",apDesc:"We design and develop mobile & web apps.",apF1:"Mobile apps",apF2:"Web apps",apF3:"Maintenance",apCnt:"Coming soon",viewWork3:"View work",
+  prTitle:"Print",prDesc:"Posters, brochures, flyers & business cards.",prF1:"Posters",prF2:"Cards",prF3:"Print design",prCta:"Request",prView:"Inquire",
   bizTitle:"Business",bizDesc:"Websites and landing pages for companies, brands & stores.",
   bizF1:"Company sites",bizF2:"Landing pages",bizF3:"Branding",bizCnt:"Coming soon",
   chTitle:"Church",chDesc:"Sites for churches & missions. Always free for churches.",
@@ -359,6 +377,7 @@ const T={
   s2t:"Development",s2p:"Responsive, fast sites with admin tooling.",
   s3t:"AI Solutions",s3p:"Custom AI tools that help your work.",
   s4t:"Care",s4p:"Hosting, updates & ongoing support.",
+  s5t:"Print Design",s5p:"Posters, brochures, flyers & business cards.",
   galTitle:"In the studio, <em>every day</em>",galSub:"Designing, building, refining.",
   stKick:"The Company",stH2:"An AI-driven IT company in Texas, <em>helping people through tech</em>.",
   stM1:"USA · based",stM2:"live church sites",stM3free:"Free",stM3:"church websites",stM4:"bilingual support",

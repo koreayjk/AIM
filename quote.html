@@ -76,7 +76,8 @@ tbody tr.preset td.itm input{font-weight:600}
 .pay .bk{font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin-bottom:8px}
 .payinput{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-family:inherit;font-size:.9rem;color:var(--ink2);resize:none;overflow:hidden;line-height:1.55}
 .payinput:focus{outline:none;border-color:var(--navy)}
-.paybtn-wrap{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.paybtn-wrap{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.paybtn-wrap .paybtn{font-size:.84rem;padding:10px 16px}
 .paybtn{background:#635bff;color:#fff;border:none;border-radius:10px;padding:11px 20px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:inherit}
 .paybtn:hover{background:#4f47e8}
 .paybtn:disabled{opacity:.6;cursor:wait}
@@ -199,16 +200,18 @@ tbody tr.preset td.itm input{font-weight:600}
   <div class="pay">
     <div class="bk" data-i18n="payLabel">결제 조건 / Payment</div>
     <textarea class="payinput" id="m_pay" rows="6"></textarea>
-    <div class="paybtn-wrap no-print">
-      <button class="paybtn" id="payBtn" data-i18n="makeLink">💳 카드 결제 링크 만들기</button>
+    <div class="paybtn-wrap no-print" id="payButtons">
+      <button class="paybtn" id="payOnce" data-freq="once">📧 <span data-i18n="sendOnce">일시불 인보이스 발송</span></button>
+      <button class="paybtn" id="payMonth" data-freq="month">📧 <span data-i18n="sendMonth">매월 구독 발송</span></button>
+      <button class="paybtn" id="payYear" data-freq="year">📧 <span data-i18n="sendYear">매년 구독 발송</span></button>
       <span class="paymsg" id="payMsg"></span>
     </div>
     <div class="paylink-box no-print" id="payLinkBox">
-      <div class="lab" data-i18n="linkReady">결제 링크가 생성되었습니다 (Stripe)</div>
+      <div class="lab" id="payLinkLab" data-i18n="invoiceSent">고객 이메일로 인보이스가 발송되었습니다</div>
       <a class="link" id="payLink" href="#" target="_blank" rel="noopener"></a>
       <div class="acts">
         <button id="payCopy" data-i18n="copyLink">📋 링크 복사</button>
-        <a id="payOpen" href="#" target="_blank" rel="noopener" data-i18n="openCheckout">결제창 열기 ↗</a>
+        <a id="payOpen" href="#" target="_blank" rel="noopener" data-i18n="openCheckout">인보이스 열어보기 ↗</a>
       </div>
     </div>
   </div>
@@ -237,6 +240,11 @@ const T={
     payLabel:"결제 조건 / Payment", payPh:"",
     payDefault:"송금 또는 카드 결제로 진행해 주세요. 카드 결제 시 결제 링크를 별도로 보내드립니다.\n\n[ 송금 ] IM America Group Corp · Chase Bank\n  · Routing number: 111000614\n  · Account number: 2907625719\n  · Swift code: CHASUS33",
     makeLink:"💳 카드 결제 링크 만들기", linkReady:"결제 링크가 생성되었습니다 (Stripe)",
+    sendOnce:"일시불 인보이스 발송", sendMonth:"매월 구독 발송", sendYear:"매년 구독 발송",
+    invoiceSent:"고객 이메일로 인보이스가 발송되었습니다",
+    needEmail:"먼저 받는 곳 이메일을 입력해 주세요.",
+    noItems:"해당 결제주기의 항목이 없습니다.",
+    sending:"발송 중…",
     copyLink:"📋 링크 복사", openCheckout:"결제창 열기 ↗",
     creating:"링크 생성 중…", needAmount:"먼저 청구액을 입력해 주세요.",
     payErr:"결제 링크 생성 실패. 잠시 후 다시 시도해 주세요.",
@@ -257,6 +265,11 @@ const T={
     payLabel:"Payment Terms", payPh:"",
     payDefault:"Pay by wire transfer or credit card. A separate payment link will be sent for card payment.\n\n[ Wire Transfer ] IM America Group Corp · Chase Bank\n  · Routing number: 111000614\n  · Account number: 2907625719\n  · Swift code: CHASUS33",
     makeLink:"💳 Create Card Payment Link", linkReady:"Payment link created (Stripe)",
+    sendOnce:"Send One-time Invoice", sendMonth:"Send Monthly Subscription", sendYear:"Send Yearly Subscription",
+    invoiceSent:"Invoice sent to customer email",
+    needEmail:"Please enter customer email first.",
+    noItems:"No items for this billing cycle.",
+    sending:"Sending…",
     copyLink:"📋 Copy Link", openCheckout:"Open Checkout ↗",
     creating:"Creating link…", needAmount:"Please enter the total amount first.",
     payErr:"Failed to create payment link. Please try again.",
@@ -376,38 +389,85 @@ function currentFinalAmount(){
   return d;
 }
 
-async function makePayLink(){
+function itemsByFreq(freq){
+  // collect rows with that frequency and non-empty item name + discounted amount > 0
+  const out=[];
+  document.querySelectorAll('#rows tr').forEach(tr=>{
+    const itemEl=tr.querySelector('.r-item'); if(!itemEl)return;
+    const itemName=itemEl.value.trim(); if(!itemName) return;
+    const fq=tr.querySelector('.r-freq').value;
+    if(fq!==freq) return;
+    const ov=parseNum(tr.querySelector('.r-orig').value);
+    const dvRaw=tr.querySelector('.r-disc').value.trim();
+    const dv=dvRaw===''?ov:parseNum(dvRaw);
+    if(dv<=0) return;
+    out.push({name:itemName, amount:dv});
+  });
+  return out;
+}
+
+function refreshPayButtons(){
+  ['once','month','year'].forEach(fq=>{
+    const items=itemsByFreq(fq);
+    const btn=document.querySelector(`#payButtons [data-freq="${fq}"]`);
+    if(!btn) return;
+    btn.style.display = items.length>0 ? '' : 'none';
+  });
+}
+
+async function sendInvoice(freq){
   const t=T[lang]; const msg=document.getElementById('payMsg'); const box=document.getElementById('payLinkBox');
   msg.textContent=""; msg.className="paymsg"; box.classList.remove('show');
-  const amount=currentFinalAmount();
-  if(!amount || amount<=0){ msg.textContent=t.needAmount; msg.className="paymsg err"; return; }
-  const btn=document.getElementById('payBtn'); const orig=btn.textContent;
-  btn.disabled=true; btn.textContent=t.creating;
+
+  const email=document.getElementById('m_email').value.trim();
+  if(!email){ msg.textContent=t.needEmail; msg.className="paymsg err"; return; }
+
+  const items=itemsByFreq(freq);
+  if(items.length===0){ msg.textContent=t.noItems; msg.className="paymsg err"; return; }
+
+  const btn=document.querySelector(`#payButtons [data-freq="${freq}"]`);
+  const orig=btn.innerHTML;
+  btn.disabled=true; btn.innerHTML='⏳ '+t.sending;
+
+  const isSub = (freq!=='once');
+  const body = {
+    mode: isSub ? 'subscription' : 'payment',
+    interval: freq==='year' ? 'year' : 'month',
+    currency: cur,
+    email,
+    name: document.getElementById('m_org').value || "",
+    items,
+    memo: document.getElementById('m_pay').value || ""
+  };
+
   try{
     const res=await fetch(EDGE_URL,{
       method:"POST",
       headers:{ "Content-Type":"application/json", "Authorization":"Bearer "+SUPABASE_ANON, "apikey":SUPABASE_ANON },
-      body: JSON.stringify({
-        amount, currency: cur, 
-        org: document.getElementById('m_org').value || "",
-        email: document.getElementById('m_email').value || "",
-        desc: document.getElementById('m_proj').value || "@IM 홈페이지 제작"
-      })
+      body: JSON.stringify(body)
     });
-    const data = await res.json();
+    const data=await res.json();
     if(!res.ok || !data.url) throw new Error(data.error || "fail");
     document.getElementById('payLink').textContent = data.url;
     document.getElementById('payLink').href = data.url;
     document.getElementById('payOpen').href = data.url;
+    document.getElementById('payLinkLab').textContent = T[lang].invoiceSent;
     box.classList.add('show');
+    msg.textContent="✓ "+T[lang].invoiceSent; msg.className="paymsg";
   }catch(err){
     console.error(err);
-    msg.textContent=t.payErr; msg.className="paymsg err";
+    msg.textContent=t.payErr+" ("+(err.message||"error")+")"; msg.className="paymsg err";
   }finally{
-    btn.disabled=false; btn.textContent=orig;
+    btn.disabled=false; btn.innerHTML=orig;
   }
 }
-document.getElementById('payBtn').addEventListener('click',makePayLink);
+document.querySelectorAll('#payButtons [data-freq]').forEach(b=>{
+  b.addEventListener('click',()=>sendInvoice(b.dataset.freq));
+});
+// keep buttons in sync with items
+const _origCalc=calc;
+calc=function(){_origCalc(); refreshPayButtons();};
+setTimeout(refreshPayButtons,0);
 document.getElementById('payCopy').addEventListener('click',async e=>{
   const url=document.getElementById('payLink').href;
   try{ await navigator.clipboard.writeText(url); }

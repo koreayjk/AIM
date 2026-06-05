@@ -45,7 +45,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:14px;pa
 .tabs button.on{background:var(--navy);color:#fff}
 .tools{display:flex;gap:9px;align-items:center}
 .badge{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
-.st-대기{background:#eceff3;color:#5b6675}.st-검토완료{background:#e7f0fb;color:#2266b8}.st-제작중{background:#fff2dd;color:#b9760a}
+.st-대기{background:#eceff3;color:#5b6675}.st-견적발송{background:#e2f3f1;color:#0f7a73}.st-검토완료{background:#e7f0fb;color:#2266b8}.st-제작중{background:#fff2dd;color:#b9760a}
 .st-제작완료{background:#e7f6ec;color:#1e8a4c}.st-컨펌{background:#efe9fb;color:#6a48c0}.st-확정{background:#1f3f73;color:#fff}
 .src{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:6px}
 .src-web{background:var(--soft);color:var(--navy)}.src-manual{background:#fdeede;color:#a86412}
@@ -105,6 +105,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:14px;pa
 .drow .v{flex:1;white-space:pre-wrap}.drow .v a{color:var(--navy);font-weight:600}
 .mfoot{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
 .copy{background:var(--navy);color:#fff;border:none;border-radius:10px;padding:11px 18px;font-weight:700;font-size:.9rem}.copy.ok{background:#1e8a4c}
+.qbtn{background:#0f7a73;color:#fff;border:none;border-radius:10px;padding:11px 18px;font-weight:700;font-size:.9rem}.qbtn:hover{background:#0b5f59}
 .del{background:none;border:1px solid #e3c4c0;color:var(--err);border-radius:10px;padding:10px 16px;font-weight:600;font-size:.86rem}.del:hover{background:#fdf0ef}
 @media(max-width:720px){.frow{grid-template-columns:1fr}.lrow{grid-template-columns:26px 1fr 80px;font-size:.85rem}.lrow .hide-m{display:none}}
 </style>
@@ -173,7 +174,7 @@ const SUPABASE_URL = "https://lnrugwschlcesaaertgc.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxucnVnd3NjaGxjZXNhYWVydGdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0ODczNzgsImV4cCI6MjA5NjA2MzM3OH0.JTpEUF2TO2NcuS1ak04hqd2IYfZ2bYn40L3EaLIwVGw";
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const STATUSES=["대기","검토완료","제작중","제작완료","컨펌","확정"];
+const STATUSES=["대기","견적발송","검토완료","제작중","제작완료","컨펌","확정"];
 const MODE_LABEL={keep:"기존 그대로",similar:"참고 제작",new:"새로 제작"};
 let rows=[], assignees=[], selId=null, view='list';
 
@@ -326,6 +327,7 @@ function openDetail(id){
         ${(r.etc)?`<div class="dgrp"><div class="gk">기타 요청</div>${field('내용',r.etc)}</div>`:''}
       </div>
       <div class="mfoot">
+        <button class="qbtn" id="quoteBtn">🧾 견적서 만들기</button>
         <button class="copy" id="copyBtn">📋 내용 복사 (Claude에게 붙여넣기)</button>
         <button class="del" id="delBtn">삭제</button>
       </div>
@@ -358,6 +360,13 @@ function bindDetail(r){
   document.getElementById('copyBtn').addEventListener('click',async e=>{
     const t=buildText(r); try{await navigator.clipboard.writeText(t);}catch(_){const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}ta.remove();}
     const b=e.currentTarget,o=b.textContent;b.classList.add('ok');b.textContent='✓ 복사되었습니다!';setTimeout(()=>{b.classList.remove('ok');b.textContent=o;},1600);
+  });
+  document.getElementById('quoteBtn').addEventListener('click',()=>{
+    const p=new URLSearchParams({
+      org:r.org_name||'', name:r.contact_name||'', phone:r.phone||'', email:r.email||'',
+      mode:r.mode||'', lang:'ko'
+    });
+    window.open('quote.html?'+p.toString(),'_blank');
   });
   document.getElementById('delBtn').addEventListener('click',()=>del(r.id));
 }

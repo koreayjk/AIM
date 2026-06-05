@@ -433,7 +433,7 @@ async function sendInvoice(freq){
   const body = {
     mode: isSub ? 'subscription' : 'payment',
     interval: freq==='year' ? 'year' : 'month',
-    currency: cur,
+    currency: cur.toLowerCase(),
     email,
     name: document.getElementById('m_org').value || "",
     items,

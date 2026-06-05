@@ -52,6 +52,8 @@ tbody td{border-bottom:1px solid var(--line);padding:4px 8px;vertical-align:midd
 tbody td.idx{color:var(--muted);font-size:.82rem;width:30px;text-align:center}
 tbody input,tbody select{width:100%;border:none;padding:8px 6px;font-size:.9rem;background:transparent;font-family:inherit;color:inherit}
 .r-freq{font-size:.82rem;text-align:center;cursor:pointer;color:var(--ink2)}
+tr.empty-item .r-freq,tr.empty-item .r-orig,tr.empty-item .r-disc{visibility:hidden}
+@media print{tr.empty-item{display:none !important}}
 .r-freq:focus{outline:none;background:var(--soft);border-radius:6px}
 tbody input:focus{outline:none;background:var(--soft);border-radius:6px}
 tbody input.amt{text-align:right;font-variant-numeric:tabular-nums}
@@ -72,7 +74,7 @@ tbody tr.preset td.itm input{font-weight:600}
 .binput:focus{outline:none;color:var(--ink);border-bottom:1px dashed var(--navy)}
 .pay{margin-top:18px}
 .pay .bk{font-size:.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);margin-bottom:8px}
-.payinput{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-family:inherit;font-size:.9rem;color:var(--ink2)}
+.payinput{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-family:inherit;font-size:.9rem;color:var(--ink2);resize:none;overflow:hidden;line-height:1.55}
 .payinput:focus{outline:none;border-color:var(--navy)}
 .paybtn-wrap{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .paybtn{background:#635bff;color:#fff;border:none;border-radius:10px;padding:11px 20px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:inherit}
@@ -113,6 +115,8 @@ tbody tr.preset td.itm input{font-weight:600}
   .taxnote{font-size:8.5pt;margin-top:4px}
   .notes,.pay{margin-top:10px;padding-top:8px}
   .notes textarea,.payinput{font-size:9pt;line-height:1.4;border:none !important}
+  .notes textarea::placeholder,.payinput::placeholder{color:transparent !important}
+  textarea::placeholder,input::placeholder{color:transparent !important}
   .foot-note{margin-top:8px;font-size:8pt}
   .pay .bk,.notes .bk{margin-bottom:5px}
   select{-webkit-appearance:none;appearance:none;background:transparent}
@@ -231,7 +235,7 @@ const T={
     notesLabel:"비고 / Notes", notesPh:"작업 범위, 수정 횟수, 기타 안내사항 등을 적어 주세요.",
     addrPh:"주소 (입력)", einPh:"EIN (입력)", taxIncluded:"※ 표시된 모든 금액은 세금(부가세) 포함 금액입니다.",
     payLabel:"결제 조건 / Payment", payPh:"",
-    payDefault:"송금 또는 카드 결제 중 선택 가능합니다.\n\n[ 송금 ] IM America Group Corp · Chase Bank\n  · Routing number: 111000614\n  · Account number: 2907625719\n  · Swift code: CHASUS33\n\n[ 카드 결제 ] 아래 \"카드 결제 링크 만들기\" 버튼으로 결제 링크를 받으실 수 있습니다.",
+    payDefault:"송금 또는 카드 결제로 진행해 주세요. 카드 결제 시 결제 링크를 별도로 보내드립니다.\n\n[ 송금 ] IM America Group Corp · Chase Bank\n  · Routing number: 111000614\n  · Account number: 2907625719\n  · Swift code: CHASUS33",
     makeLink:"💳 카드 결제 링크 만들기", linkReady:"결제 링크가 생성되었습니다 (Stripe)",
     copyLink:"📋 링크 복사", openCheckout:"결제창 열기 ↗",
     creating:"링크 생성 중…", needAmount:"먼저 청구액을 입력해 주세요.",
@@ -251,7 +255,7 @@ const T={
     notesLabel:"Notes", notesPh:"Scope of work, revisions, other notes…",
     addrPh:"Address", einPh:"EIN", taxIncluded:"※ All amounts shown are tax included.",
     payLabel:"Payment Terms", payPh:"",
-    payDefault:"You may pay by wire transfer or credit card.\n\n[ Wire Transfer ] IM America Group Corp · Chase Bank\n  · Routing number: 111000614\n  · Account number: 2907625719\n  · Swift code: CHASUS33\n\n[ Credit Card ] Use the \"Create Card Payment Link\" button below to receive a payment link.",
+    payDefault:"Pay by wire transfer or credit card. A separate payment link will be sent for card payment.\n\n[ Wire Transfer ] IM America Group Corp · Chase Bank\n  · Routing number: 111000614\n  · Account number: 2907625719\n  · Swift code: CHASUS33",
     makeLink:"💳 Create Card Payment Link", linkReady:"Payment link created (Stripe)",
     copyLink:"📋 Copy Link", openCheckout:"Open Checkout ↗",
     creating:"Creating link…", needAmount:"Please enter the total amount first.",
@@ -289,7 +293,11 @@ function addRow(itemVal,freq){
   const tb=document.getElementById('rows');
   tb.insertAdjacentHTML('beforeend',rowHTML(itemVal,freq));
   const tr=tb.lastElementChild;
+  const itemInp=tr.querySelector('.r-item');
+  const syncEmpty=()=>{tr.classList.toggle('empty-item', !itemInp.value.trim());};
   tr.querySelectorAll('input,select').forEach(inp=>{inp.addEventListener('input',calc);inp.addEventListener('change',calc);});
+  itemInp.addEventListener('input',syncEmpty);
+  syncEmpty();
   reindex();
 }
 function reindex(){ document.querySelectorAll('#rows tr').forEach((tr,i)=>tr.querySelector('.idx').textContent=i+1); }
@@ -307,6 +315,7 @@ function calc(){
   document.getElementById('t_final').textContent=fmt(d);
 }
 
+function autoGrow(el){if(!el)return; el.style.height='auto'; el.style.height=(el.scrollHeight+2)+'px';}
 function applyLang(){
   const t=T[lang]; document.documentElement.lang=lang; document.title=t.title;
   document.querySelectorAll('[data-i18n]').forEach(e=>{const k=e.getAttribute('data-i18n'); if(t[k]!==undefined)e.innerHTML=t[k];});
@@ -322,6 +331,7 @@ function applyLang(){
   // payment terms default
   const pay=document.getElementById('m_pay');
   if(pay && (pay.value===''||pay.value===T[other].payDefault)) pay.value=T[lang].payDefault;
+  autoGrow(pay);
   // valid + project defaults if untouched
   const v=document.getElementById('m_valid'); if(v.value===''||v.value===T[other].validVal) v.value=T[lang].validVal;
   const p=document.getElementById('m_proj'); if(p.value===''||p.value===T[other].projVal||p.value==='홈페이지 제작') p.value=T[lang].projVal;
@@ -349,6 +359,7 @@ document.querySelectorAll('#langSeg button').forEach(b=>b.addEventListener('clic
   document.getElementById('m_date').value=new Date().toLocaleDateString(lang==='ko'?'ko-KR':'en-US',{year:'numeric',month:'2-digit',day:'2-digit'});
 }));
 document.getElementById('cur').addEventListener('change',e=>{cur=e.target.value;calc();});
+(()=>{const p=document.getElementById('m_pay'); if(p) p.addEventListener('input',()=>autoGrow(p));})();
 document.getElementById('pdfBtn').addEventListener('click',()=>window.print());
 
 const EDGE_URL = "https://lnrugwschlcesaaertgc.supabase.co/functions/v1/create-checkout";
